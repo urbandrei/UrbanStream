@@ -32,6 +32,8 @@ class OllamaClient:
         if max_tokens:
             payload["options"]["num_predict"] = max_tokens
         resp = await self._client.post("/api/generate", json=payload)
+        if resp.status_code != 200:
+            print(f"[Ollama] generate error {resp.status_code}: {resp.text}")
         resp.raise_for_status()
         return resp.json()["response"]
 
@@ -47,6 +49,8 @@ class OllamaClient:
         if max_tokens:
             payload["options"]["num_predict"] = max_tokens
         resp = await self._client.post("/api/chat", json=payload)
+        if resp.status_code != 200:
+            print(f"[Ollama] chat error {resp.status_code}: {resp.text}")
         resp.raise_for_status()
         return resp.json()["message"]["content"]
 
@@ -61,6 +65,8 @@ class OllamaClient:
                 "keep_alive": OLLAMA_KEEP_ALIVE,
                 "options": {"num_predict": 1, "num_ctx": OLLAMA_NUM_CTX},
             })
+            if resp.status_code != 200:
+                print(f"[LLM] Preload error for {model}: {resp.text}")
             resp.raise_for_status()
         except Exception as e:
             print(f"[LLM] Preload failed for {model}: {e}")

@@ -12,7 +12,11 @@ OLLAMA_BIG_MODEL = os.getenv("OLLAMA_BIG_MODEL", "llama3:8b")
 OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
 
 # Performance
-OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "-1")  # -1 = never unload
+_keep_alive_raw = os.getenv("OLLAMA_KEEP_ALIVE", "-1")
+try:
+    OLLAMA_KEEP_ALIVE = int(_keep_alive_raw)  # -1 = never unload
+except ValueError:
+    OLLAMA_KEEP_ALIVE = _keep_alive_raw  # allow duration strings like "5m"
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "1024"))  # context window size
 
 # Smart filter
