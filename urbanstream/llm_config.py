@@ -6,7 +6,8 @@ load_dotenv()
 
 # Ollama connection
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3:8b")
+OLLAMA_FAST_MODEL = os.getenv("OLLAMA_FAST_MODEL", "llama3.2:3b")
+OLLAMA_BIG_MODEL = os.getenv("OLLAMA_BIG_MODEL", "llama3:8b")
 OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
 
 # Smart filter
@@ -28,9 +29,3 @@ MOD_TIMEOUT_DURATION = int(os.getenv("MOD_TIMEOUT_DURATION", "300"))
 
 # Bot identity
 BOT_NAME = os.getenv("BOT_NAME", "UrbanBot")
-BOT_PERSONALITY = os.getenv(
-    "BOT_PERSONALITY",
-    "You are UrbanBot, a friendly and witty Twitch chat assistant. "
-    "You keep responses short, entertaining, and relevant to the stream. "
-    "You can be sarcastic but never mean. You love engaging with chat.",
-)

@@ -7,3 +7,4 @@ __pycache__/
 *.pyo
 chroma_data/
 knowledge/
+moderation.db
