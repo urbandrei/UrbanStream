@@ -53,15 +53,17 @@ class OllamaClient:
     async def preload(self, model=None):
         """Send a minimal request to load a model into memory."""
         model = model or self.tiny_model
-        payload = {
-            "model": model,
-            "prompt": "",
-            "stream": False,
-            "keep_alive": OLLAMA_KEEP_ALIVE,
-            "options": {"num_predict": 1},
-        }
-        resp = await self._client.post("/api/generate", json=payload)
-        resp.raise_for_status()
+        try:
+            resp = await self._client.post("/api/chat", json={
+                "model": model,
+                "messages": [{"role": "user", "content": "hi"}],
+                "stream": False,
+                "keep_alive": OLLAMA_KEEP_ALIVE,
+                "options": {"num_predict": 1, "num_ctx": OLLAMA_NUM_CTX},
+            })
+            resp.raise_for_status()
+        except Exception as e:
+            print(f"[LLM] Preload failed for {model}: {e}")
 
     # ── convenience wrappers ────────────────────────────
 
