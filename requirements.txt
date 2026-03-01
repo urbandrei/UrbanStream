@@ -1,0 +1,9 @@
+twitchio>=2.0,<3.0
+gtts
+pygame
+emoji
+SpeechRecognition
+PyAudio
+python-dotenv
+httpx
+chromadb

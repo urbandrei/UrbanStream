@@ -1,0 +1,117 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: Arial, sans-serif;
+}
+
+.chatter {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    transition: transform 8s linear;
+}
+
+.chatter .name {
+    font-size: 21px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+    white-space: nowrap;
+    margin-bottom: 2px;
+}
+
+.sprite {
+    image-rendering: pixelated;
+    background-image: url(/bot.png);
+    background-repeat: no-repeat;
+    margin: 0 auto;
+}
+
+.bubble {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #000;
+    font-size: 20px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    max-width: 420px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-bottom: 4px;
+}
+
+/* ── Jail ── */
+
+#jail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 100;
+}
+
+#jail.active {
+    display: block;
+}
+
+#jail-cage {
+    position: relative;
+    width: 300px;
+    min-height: 140px;
+}
+
+#jail-ceiling, #jail-floor {
+    height: 8px;
+    background: #777;
+    border-radius: 2px;
+}
+
+#jail-bars {
+    display: flex;
+    justify-content: space-evenly;
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+}
+
+#jail-bars .bar {
+    width: 6px;
+    background: #777;
+    border-radius: 1px;
+}
+
+#jail-inmates {
+    position: relative;
+    min-height: 124px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 12px;
+}
+
+.chatter.jailed {
+    position: relative !important;
+    bottom: auto !important;
+    transform: none !important;
+    transition: none !important;
+    flex-shrink: 0;
+}
+
+@keyframes jail-fall {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(400px); }
+}

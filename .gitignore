@@ -1,0 +1,9 @@
+.env
+token.json
+nicknames.json
+.tio.tokens.json
+__pycache__/
+*.pyc
+*.pyo
+chroma_data/
+knowledge/
