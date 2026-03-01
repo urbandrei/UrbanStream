@@ -19,6 +19,7 @@ class AppState:
         self.jailed = set()             # lowercase usernames currently in jail
         self.llm_enabled = True         # master toggle for LLM assistant
         self.llm_assistant = None       # LLMAssistant instance (set by bot)
+        self.headless = False           # set via --headless CLI flag
 
         # Nicknames (persisted to disk)
         self.nicknames = {}

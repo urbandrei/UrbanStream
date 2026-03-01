@@ -97,7 +97,8 @@ class Bot(twitchio.Client):
     async def event_ready(self):
         print(f"Connected to #{CHANNEL} — listening for messages...")
         start_overlay_server(self._state)
-        start_voice_listener(self, self._state)
+        if not self._state.headless:
+            start_voice_listener(self, self._state)
         self.loop.create_task(self.auto_ad_loop())
         self.loop.create_task(self.chatter_poll_loop())
 
