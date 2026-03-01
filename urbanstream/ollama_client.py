@@ -51,11 +51,14 @@ class OllamaClient:
         return resp.json()["message"]["content"]
 
     async def preload(self, model=None):
-        """Send an empty request to load a model into memory."""
+        """Send a minimal request to load a model into memory."""
         model = model or self.tiny_model
         payload = {
             "model": model,
+            "prompt": "",
+            "stream": False,
             "keep_alive": OLLAMA_KEEP_ALIVE,
+            "options": {"num_predict": 1},
         }
         resp = await self._client.post("/api/generate", json=payload)
         resp.raise_for_status()
