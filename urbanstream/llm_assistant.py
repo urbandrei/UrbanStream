@@ -24,7 +24,7 @@ DEFAULT_PERSONALITY = (
     "Keep responses short and direct. No fluff."
 )
 
-CONFIDENCE_RE = re.compile(r"\nCONFIDENCE:\s*(high|low)\s*$", re.I)
+CONFIDENCE_RE = re.compile(r"^CONFIDENCE:\s*(high|low)\s*$", re.I | re.M)
 MOD_QUERY_KEYWORDS = re.compile(r"\b(why|jail|jailed|warn|warned|ban|banned|timeout|timed out|moderat|punish|kick)\b", re.I)
 
 
@@ -51,7 +51,6 @@ Guidelines:
 - If you have nothing useful to add, respond with exactly "SKIP" and nothing else.
 - Never reveal that you are an AI or LLM unless directly asked.
 - Do not repeat what others have said.
-- After your response, on a new line write exactly CONFIDENCE: high or CONFIDENCE: low.
 """
 
 
@@ -76,13 +75,12 @@ class LLMAssistant:
             return
 
         print(f"[LLM] Ollama connected. Models: {info}")
-        print(f"[LLM] Tiny: {self._ollama.tiny_model} | "
-              f"Mid: {self._ollama.mid_model} | "
+        print(f"[LLM] Fast: {self._ollama.fast_model} | "
               f"Big: {self._ollama.big_model}")
 
-        # Preload tiny model into memory
-        print(f"[LLM] Preloading tiny model...")
-        await self._ollama.preload(self._ollama.tiny_model)
+        # Preload fast model into memory
+        print(f"[LLM] Preloading fast model...")
+        await self._ollama.preload(self._ollama.fast_model)
 
         # Load personality
         personality = _load_personality(self._state.base_dir)
@@ -252,27 +250,22 @@ class LLMAssistant:
                 {"role": "user", "content": user_content},
             ]
 
-            # Step 1: Tiny model with confidence signal
-            response = await self._ollama.chat_tiny(
+            # Step 1: Fast model answers
+            response = await self._ollama.chat_fast(
                 messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
             )
-            response, confidence = self._extract_confidence(response)
+            response = self._strip_confidence(response)
 
-            # Step 2: Escalate to mid model if low confidence
-            if confidence == "low":
-                print(f"[LLM] Low confidence, escalating to mid model")
-                response = await self._ollama.chat_mid(
-                    messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
-                )
-                response, confidence = self._extract_confidence(response)
-
-            # Step 3: Escalate to big model if still low confidence
-            if confidence == "low":
-                print(f"[LLM] Still low confidence, escalating to big model")
+            # Step 2: Escalate to big model if response is weak
+            if self._needs_escalation(response):
+                print(f"[LLM] Weak response from fast model, escalating to big model")
+                thinking_msg = "Let me think about that a little more."
+                await self._bot.send_chat(thinking_msg)
+                self._state.speech_queue.put(f"{BOT_NAME} says {thinking_msg}")
                 response = await self._ollama.chat_big(
                     messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
                 )
-                response, _ = self._extract_confidence(response)
+                response = self._strip_confidence(response)
 
             response = response.strip()
 
@@ -324,16 +317,24 @@ class LLMAssistant:
         return "\n".join(lines)
 
     @staticmethod
-    def _extract_confidence(text):
-        """Strip CONFIDENCE: line and return (clean_text, 'high'|'low')."""
-        text = text.strip()
-        match = CONFIDENCE_RE.search(text)
-        if match:
-            confidence = match.group(1).lower()
-            clean = text[:match.start()].strip()
-            return clean, confidence
-        # No confidence tag found — assume high (don't escalate)
-        return text, "high"
+    def _strip_confidence(text):
+        """Remove any CONFIDENCE: lines the model may have added."""
+        return CONFIDENCE_RE.sub("", text).strip()
+
+    @staticmethod
+    def _needs_escalation(response):
+        """Check if a response is too weak and needs a bigger model."""
+        clean = response.strip()
+        if not clean:
+            return True
+        # Too short to be useful (less than 10 chars)
+        if len(clean) < 10:
+            return True
+        # Model just echoed back an instruction or tag
+        if clean.upper() in ("CONFIDENCE: LOW", "CONFIDENCE: HIGH", "CONFIDENCE:LOW",
+                             "CONFIDENCE:HIGH", "SKIP"):
+            return False  # SKIP is intentional, not a failure
+        return False
 
     async def stop(self):
         self._running = False
