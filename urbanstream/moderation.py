@@ -102,7 +102,7 @@ class ModerationEngine:
         history = self._format_history(username)
         prompt = SCREEN_PROMPT.format(username=username, text=text) + history
         try:
-            response = await self._client.generate_fast(
+            response = await self._client.generate_tiny(
                 prompt, max_tokens=LLM_MAX_RESPONSE_TOKENS
             )
             return self._parse_response(response)

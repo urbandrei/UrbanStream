@@ -6,9 +6,14 @@ load_dotenv()
 
 # Ollama connection
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_FAST_MODEL = os.getenv("OLLAMA_FAST_MODEL", "llama3.2:3b")
+OLLAMA_TINY_MODEL = os.getenv("OLLAMA_TINY_MODEL", "llama3.2:1b")
+OLLAMA_MID_MODEL = os.getenv("OLLAMA_MID_MODEL", "llama3.2:3b")
 OLLAMA_BIG_MODEL = os.getenv("OLLAMA_BIG_MODEL", "llama3:8b")
 OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+
+# Performance
+OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "-1")  # -1 = never unload
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "1024"))  # context window size
 
 # Smart filter
 LLM_COOLDOWN_SECONDS = int(os.getenv("LLM_COOLDOWN_SECONDS", "30"))

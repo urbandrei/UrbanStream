@@ -76,8 +76,13 @@ class LLMAssistant:
             return
 
         print(f"[LLM] Ollama connected. Models: {info}")
-        print(f"[LLM] Fast model: {self._ollama.fast_model} | "
-              f"Big model: {self._ollama.big_model}")
+        print(f"[LLM] Tiny: {self._ollama.tiny_model} | "
+              f"Mid: {self._ollama.mid_model} | "
+              f"Big: {self._ollama.big_model}")
+
+        # Preload tiny model into memory
+        print(f"[LLM] Preloading tiny model...")
+        await self._ollama.preload(self._ollama.tiny_model)
 
         # Load personality
         personality = _load_personality(self._state.base_dir)
@@ -247,15 +252,23 @@ class LLMAssistant:
                 {"role": "user", "content": user_content},
             ]
 
-            # Step 1: Fast model with confidence signal
-            response = await self._ollama.chat_fast(
+            # Step 1: Tiny model with confidence signal
+            response = await self._ollama.chat_tiny(
                 messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
             )
             response, confidence = self._extract_confidence(response)
 
-            # Step 2: Escalate to big model if low confidence
+            # Step 2: Escalate to mid model if low confidence
             if confidence == "low":
-                print(f"[LLM] Low confidence, escalating to big model")
+                print(f"[LLM] Low confidence, escalating to mid model")
+                response = await self._ollama.chat_mid(
+                    messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
+                )
+                response, confidence = self._extract_confidence(response)
+
+            # Step 3: Escalate to big model if still low confidence
+            if confidence == "low":
+                print(f"[LLM] Still low confidence, escalating to big model")
                 response = await self._ollama.chat_big(
                     messages, max_tokens=LLM_MAX_RESPONSE_TOKENS
                 )
