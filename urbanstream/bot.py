@@ -21,10 +21,12 @@ class Bot(twitchio.Client):
         self._token = token
         self._broadcaster_id = broadcaster_id
         self._state = state
+        self._sent_messages = set()
 
     async def send_chat(self, text):
         channel = self.get_channel(CHANNEL)
         if channel:
+            self._sent_messages.add(text)
             await channel.send(text)
 
     async def run_ad(self, duration=60):
@@ -192,5 +194,9 @@ class Bot(twitchio.Client):
 
         # Feed non-command messages to LLM assistant
         if state.llm_assistant and state.llm_enabled:
-            msg_id = message.tags.get("id", "")
-            asyncio.create_task(state.llm_assistant.on_chat_message(author, text, msg_id))
+            if text in self._sent_messages:
+                self._sent_messages.discard(text)
+                asyncio.create_task(state.llm_assistant.on_bot_message(text))
+            else:
+                msg_id = message.tags.get("id", "")
+                asyncio.create_task(state.llm_assistant.on_chat_message(author, text, msg_id))

@@ -122,6 +122,12 @@ class LLMAssistant:
             "is_streamer": username.lower() == CHANNEL.lower(),
         })
 
+    async def on_bot_message(self, text):
+        """Record bot's own message in context without triggering a response."""
+        if not self._running:
+            return
+        self._filter.record_message(BOT_NAME.lower(), text, is_streamer=False)
+
     async def on_voice_transcription(self, text):
         if not self._running:
             return
@@ -155,22 +161,15 @@ class LLMAssistant:
                     )
                 )
 
-            # Run moderation and filter decision in parallel
-            mod_task = asyncio.create_task(
-                self._moderation.evaluate(username, text, is_streamer)
-            )
-            should, score, reason = self._filter.should_respond(
-                username, text, is_streamer
-            )
+            # Run moderation on chat messages
+            if msg["type"] == "chat":
+                mod_result = await self._moderation.evaluate(username, text, is_streamer)
+                if mod_result:
+                    await self._handle_moderation(username, text, mod_result)
 
-            # Await moderation result
-            mod_result = await mod_task
-            if mod_result:
-                await self._handle_moderation(username, text, mod_result)
-
-            # Generate response if filter says yes
-            if should:
-                await self._generate_and_respond(username, text, is_streamer, reason)
+            # Only generate LLM responses for streamer voice transcriptions
+            if msg["type"] == "voice":
+                await self._generate_and_respond(username, text, is_streamer, "voice_command")
 
     async def _handle_moderation(self, username, text, result):
         action = result["action"]
