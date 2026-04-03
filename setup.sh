@@ -66,7 +66,10 @@ if ! pgrep -x ollama &>/dev/null; then
     sleep 3
 fi
 
-info "Pulling LLM model (llama3:8b) — this may take a while on first run..."
+info "Pulling fast model (llama3.2:3b)..."
+ollama pull llama3.2:3b
+
+info "Pulling big model (llama3:8b) — this may take a while on first run..."
 ollama pull llama3:8b
 
 info "Pulling embedding model (nomic-embed-text)..."
@@ -97,14 +100,31 @@ CLIENT_ID=your_twitch_client_id
 CLIENT_SECRET=your_twitch_client_secret
 CHANNEL=your_twitch_channel
 
+# ── Bot settings ──
+# BOT_NAME=UrbanBot
+
 # ── LLM settings (defaults are fine for most setups) ──
 # OLLAMA_BASE_URL=http://localhost:11434
-# OLLAMA_MODEL=llama3:8b
+# OLLAMA_FAST_MODEL=llama3.2:3b
+# OLLAMA_BIG_MODEL=llama3:8b
 # OLLAMA_EMBED_MODEL=nomic-embed-text
-# BOT_NAME=UrbanBot
 # LLM_COOLDOWN_SECONDS=30
 # LLM_RELEVANCE_THRESHOLD=0.6
 # MOD_ENABLED=true
+
+# ── Channel point reward IDs (optional) ──
+# REWARD_ACCENT=
+# REWARD_TRANSLATE=
+# REWARD_BABEL=
+# REWARD_JAIL=
+# REWARD_JAIL_DURATION=180
+# REWARD_FREE=
+# REWARD_AD=
+# REWARD_AD_DURATION=60
+
+# ── Twitch Extension (jail minigame) ──
+# EXTENSION_SECRET=
+# PLATE_REWARD=30
 EOF
     warn "Edit .env with your Twitch credentials before running the bot."
 else

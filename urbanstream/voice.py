@@ -54,20 +54,20 @@ def start_voice_listener(bot, state):
                 )
             return
 
-        if lower == "assistant on":
-            state.llm_enabled = True
-            print("[Voice] LLM assistant ON")
-            return
-        if lower == "assistant off":
-            state.llm_enabled = False
-            print("[Voice] LLM assistant OFF")
-            return
+        if state.llm_enabled:
+            if lower == "assistant on":
+                print("[Voice] LLM assistant already ON")
+                return
+            if lower == "assistant off":
+                state.llm_enabled = False
+                print("[Voice] LLM assistant OFF")
+                return
 
-        # Always feed voice to LLM (even when voice-to-chat is off)
-        if state.llm_assistant and state.llm_enabled:
-            asyncio.run_coroutine_threadsafe(
-                state.llm_assistant.on_voice_transcription(text), bot.loop
-            )
+            # Always feed voice to LLM (even when voice-to-chat is off)
+            if state.llm_assistant:
+                asyncio.run_coroutine_threadsafe(
+                    state.llm_assistant.on_voice_transcription(text), bot.loop
+                )
 
         if lower.startswith("jail "):
             name = lower[5:].strip()
@@ -91,6 +91,8 @@ def start_voice_listener(bot, state):
             sentence = sentence.strip()
             if sentence:
                 send(sentence)
+                if state.tts_translate:
+                    state.speech_queue.put(sentence)
 
     recognizer.listen_in_background(mic, voice_callback)
     print("Voice listener active — say 'chat on/off', 'ads on/off', 'run N seconds/minutes of ads'")

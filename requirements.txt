@@ -4,6 +4,7 @@ pygame
 emoji
 SpeechRecognition
 PyAudio
+deep-translator
 python-dotenv
 httpx
 chromadb

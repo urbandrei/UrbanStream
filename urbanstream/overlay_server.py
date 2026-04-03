@@ -13,7 +13,9 @@ def start_overlay_server(state):
 
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
-            if self.path == "/api/chatters":
+            path = self.path
+
+            if path == "/api/chatters":
                 now = time.time()
                 merged = {}
                 for user, info in state.chatters.items():
@@ -37,7 +39,8 @@ def start_overlay_server(state):
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
                 self.wfile.write(json.dumps(merged).encode())
-            elif self.path == "/bot.png":
+
+            elif path == "/bot.png":
                 png_path = os.path.join(state.base_dir, "bot.png")
                 with open(png_path, "rb") as f:
                     data = f.read()
@@ -46,7 +49,7 @@ def start_overlay_server(state):
                 self.send_header("Cache-Control", "public, max-age=3600")
                 self.end_headers()
                 self.wfile.write(data)
-            elif self.path == "/overlay.css":
+            elif path == "/overlay.css":
                 css_path = os.path.join(overlay_dir, "overlay.css")
                 with open(css_path, "rb") as f:
                     data = f.read()
@@ -54,7 +57,7 @@ def start_overlay_server(state):
                 self.send_header("Content-Type", "text/css")
                 self.end_headers()
                 self.wfile.write(data)
-            elif self.path == "/overlay.js":
+            elif path == "/overlay.js":
                 js_path = os.path.join(overlay_dir, "overlay.js")
                 with open(js_path, "rb") as f:
                     data = f.read()
@@ -62,7 +65,7 @@ def start_overlay_server(state):
                 self.send_header("Content-Type", "application/javascript")
                 self.end_headers()
                 self.wfile.write(data)
-            elif self.path == "/" or self.path == "":
+            elif path == "/" or path == "":
                 html_path = os.path.join(overlay_dir, "overlay.html")
                 with open(html_path, "rb") as f:
                     data = f.read()

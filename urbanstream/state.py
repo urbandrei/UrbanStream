@@ -13,6 +13,9 @@ class AppState:
         self.chat_bubbles = {}      # {username: {"text": str, "time": float}}
         self.speech_queue = queue.Queue()
         self.tts_speed = 1.0
+        self.tts_lang = "fr"
+        self.tts_translate = False
+        self.tts_babel = False
         self.auto_ads_enabled = True
         self.ad_running = False
         self.voice_chat_active = False

@@ -1,0 +1,10 @@
+jayteagibs: what about a suggestion box?
+p4songer: I think I just had an idae
+p4songer: Develop your game. We're distracting you right now
+p4songer: make a list of commands that we can see too. Something in stream description maybe?
+jayteagibs: channel point to assign accent to user
+p4songer: panel for all alive dudes
+p4songer: Before you push the final update, be sure to clear previous user data. If you have a previous session, it doesn't prompt tutorial.
+p4songer: Window resize should be a bit closer to when the prompt for overpopulation happens. I got the overpopulation prompt about 10min in, and the window resize upgrade at about an hour in
+p4songer: Balance: Toys too low, water too high. I almost never had to worry about water, and I never stopped worrying about toys. Maybe a few multiplier upgrades sooner?
+p4songer: Clicking stars changes the zoom for chrome. Not sure why, but every time I clicked one, I had to reset zoom.
